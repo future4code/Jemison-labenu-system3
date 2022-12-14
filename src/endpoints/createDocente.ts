@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
-import TurmaData from "../database/TurmaData"
-import DocenteData from "../database/DocenteData"
-import Docente from "../models/Docente"
+//import TurmaData from "../database/TurmaData"
+//import DocenteData from "../database/DocenteData"
+//import Docente from "../models/Docente"
 
-
+/*
 export const createEstudante = async (req: Request, res: Response) => {
     try {
         const { nome, email, dataNascimento, turmaId } = req.body;
@@ -47,3 +47,4 @@ export const createEstudante = async (req: Request, res: Response) => {
       }
 
       export default createEstudante
+      */
