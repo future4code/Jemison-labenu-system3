@@ -1,53 +1,99 @@
-import { Request, Response } from "express"
-import TurmaData from "../database/TurmaData"
-import EstudanteData from "../database/EstudanteData"
-import Turma from "../models/Turma"
-import Estudantes from "../models/Estudante"
+import { Request, Response } from "express";
+import { EstudanteData } from "../data/EstudanteData";
+import { EmailJaCadastrado } from "../error/EmailJaCadastrado";
+import { FaltandoInfoEstudante } from "../error/estudante/FaltandoInfoEstudante";
+import { IdEstudanteIdTurma } from "../error/estudante/IdEstudanteIdTurma";
+import { NaoEstudantesCadastrados } from "../error/estudante/NaoEstudantesCadastrados";
+import { Estudante } from "../model/Estudante";
 
+export class CreateEstudante {
 
-export const createEstudante = async (req: Request, res: Response) => {
-    try {
-        const { nome, email, dataNascimento, turmaId } = req.body;
-        const id = Date.now().toString();
-    
+    async createEstudante(req: Request, res: Response) {
+        try {
+            const { name, email, date_nasc, hobby_name } = req.body
 
+            if (!name || !email || !date_nasc || !hobby_name) {
+                throw new FaltandoInfoEstudante()
+            }
 
-       if (!nome || !email || !dataNascimento || !turmaId) {
-        req.statusCode = 400;
-        throw new Error("Todos os campos devem ser preenchidos!");
-      }
-      const newStudent = new Estudantes(nome, email, turmaId, id);
-      const turmaData = new TurmaData();
+            const id = Date.now().toString()
+            const newId = id.toString()
 
-      const TurmaExiste = await turmaData.selectTurmaId(turmaId);
+            const idEstudante = Date.now().toString()
+            const newIdEstudante = idEstudante.toString()
 
-      if (!TurmaExiste.length) {
-        throw new Error(`Turma com id ${turmaId} não existe`);
-      }
-      const studentsData = new EstudanteData();
+            const idHobby = Date.now().toString()
+            const newIdHobby = idHobby.toString()
 
-      await studentsData.insertStudent(newStudent);
+            const new_date = date_nasc.split("/")
+            const deadlineInReverse = new_date.reverse()
+            const deadlineForAmerican = deadlineInReverse.join("/")
 
-      res.status(201).send("Estudante criado com sucesso!");
-    } catch (error: any) {
-      res.status(500).send({ message: error.message });
+            const estudanteData = new EstudanteData()
+            const estudantes = await estudanteData.selectAllEstudante()
+            const verificaEmailExiste = estudantes.find((estu: any) => estu.email === email)
+
+            if (verificaEmailExiste) {
+                throw new EmailJaCadastrado()
+            }
+
+            const newEstudante = new Estudante(newIdEstudante, name, email, deadlineForAmerican, hobby_name)
+
+            const result = await estudanteData.selectHobby()
+            const findName = await result.find((resu: any) => resu.hobby_name === hobby_name)
+
+            if (findName) {
+                await estudanteData.insertEstudante(newEstudante)
+                await estudanteData.insertEstudante_Hobby(newId, newIdEstudante, findName.hobby_id)
+
+            } else {
+                await estudanteData.insertHobby(newIdHobby, hobby_name)
+                await estudanteData.insertEstudante(newEstudante)
+                await estudanteData.insertEstudante_Hobby(newId, newIdEstudante, newIdHobby)
+            }
+
+            res.status(201).send('Estudante criado')
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+        }
     }
-  }
-  async getEstudanteNome(req: Request, res: Response) {
-    try {
-      const { nome } = req.params;
-      const studentsData = new EstudanteData();
 
-      const estudantes = await studentsData.selectEstudanteNomeId(nome);
+    async getEstudanteName(req: Request, res: Response) {
+        try {
 
-      if (!estudantes) {
-        res.statusCode = 404;
-        throw new Error(`Estudante ${nome} não existe!`);
-      }      
-      res.status(200).send(estudantes);
-    } catch (error: any) {
-      res.status(500).send({ message: error.message });
+            const estudanteData = new EstudanteData()
+            let name = req.query.name as string || ""
+
+            const estudante = await estudanteData.selectEstudanteName(name)
+
+            if (!estudante.length) {
+                throw new NaoEstudantesCadastrados()
+            }
+
+            res.status(200).send(estudante)
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+        }
     }
-  }
-  
-export default createEstudante
+
+    async postTurmaEstudante(req: Request, res: Response) {
+        try {
+            const id = req.params.id
+            const turma_id = req.body.turma_id
+
+            if (!id || !turma_id) {
+                throw new IdEstudanteIdTurma()
+            }
+
+            const estudanteData = new EstudanteData()
+            await estudanteData.addTurmaEstudante(id, turma_id)
+
+            res.status(200).send("Turma alterada!")
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+        }
+    }
+}

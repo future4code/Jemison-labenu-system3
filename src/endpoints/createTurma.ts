@@ -1,78 +1,71 @@
-import { Request, Response } from "express"
-import TurmaData from "../database/TurmaData"
-import Turma from "../models/Turma"
-//import connection from "../database/connection"
+import { Request, Response } from "express";
+import { TurmaData } from "../data/TurmaData";
+import { FaltaIdModulo } from "../error/turma/FaltaIdModulo";
+import { FaltandoInfoTurma } from "../error/turma/FaltandoInfoTurma";
+import { ModuloMaiorSeis } from "../error/turma/ModuloMaiorSeis";
+import { NaoTurmasCadastradas } from "../error/turma/NaoTurmasCadastradas";
+import { Turma } from "../model/Turma";
 
-export const createTurma = async (req: Request, res: Response) => {
-    try {
-        const { nome } = req.body;
-        const id: string = Date.now().toString();
-  
-        if (!nome) {
-          throw new Error("O nome deve ser passado!!");
+export class CreateTurma {
+
+    async createTurma(req: Request, res: Response) {
+        try {
+            const { name, modulo } = req.body
+
+            if (!name || !modulo) {
+                throw new FaltandoInfoTurma()
+            }
+            if (modulo > 6) {
+                throw new ModuloMaiorSeis()
+            }
+
+            const id = Date.now().toString()
+            const newId = id.toString()
+            const newTurma = new Turma(newId, name, modulo)
+
+            const turma = new TurmaData()
+            await turma.insertTurma(newTurma)
+
+            res.status(201).send('Turma criada com sucesso')
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
         }
-  
-        const newTurma = new Turma(id, nome);
-  
-        const turmaData = new TurmaData();
-  
-        const turma = await turmaData.insertClass(newTurma);
-  
-        res.status(200).send("Turma criada com sucesso");
-      } catch (error: any) {
-        res.status(500).send({ message: error.message });
-      }
     }
-  
-    async getTurmaAtiva(req: Request, res: Response) {
-      try {
-        const turmaData = new TurmaData();
-  
-        const turmasAtivas = await turmaData.selectTurmaAtiva();
-  
-        if (!turmasAtivas?.length) {
-          throw new Error("não há turmas ativas");
+
+    async getTurma(req: Request, res: Response) {
+        try {
+            const turmaData = new TurmaData()
+            const turmas = await turmaData.selectTurma()
+
+            if (!turmas.length) {
+                throw new NaoTurmasCadastradas()
+            }
+
+            res.status(200).send(turmas)
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
         }
-  
-        res.status(200).send(turmasAtivas);
-      } catch (error: any) {
-        res.status(500).send({ message: error.message });
-      }
     }
-  
-    async mudarModulo(req: Request, res: Response) {
-      try {
-        const { turmaId, modulo } = req.body;
-  
-        if (!turmaId || !modulo) {
-          throw new Error("IdTurma e modulo devem ser passados");
+
+    async putTurmaModulo(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+            const { modulo } = req.body
+
+            if (!id || !modulo) {
+                throw new FaltaIdModulo()
+            }
+
+            const moduloData = new TurmaData()
+            await moduloData.editModulo(id, modulo)
+
+            res.status(200).send("Módulo alterado!")
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+
         }
-  
-        const turmaData = new TurmaData();
-  
-        const TurmaExiste = await turmaData.selectTurmaId(turmaId);
-  
-        if (!TurmaExiste.length) {
-          throw new Error(`Turma com id ${turmaId} não existe`);
-        }
-  
-        if (
-          modulo !== "1" &&
-          modulo !== "2" &&
-          modulo !== "3" &&
-          modulo !== "4" &&
-          modulo !== "5" &&
-          modulo !== "6"
-        ) {
-          throw new Error(`Módulo ${modulo} inválido`);
-        }
-  
-        await turmaData.updateModule(turmaId, modulo);
-  
-        res.status(200).send({ message: "modulo alterado com sucesso" });
-      } catch (error: any) {
-        res.status(500).send({ message: error.message });
-      }
     }
-  
-  export default createTurma
+}

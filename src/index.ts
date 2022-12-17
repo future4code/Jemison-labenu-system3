@@ -1,15 +1,25 @@
-import express from "express"
-import cors from 'cors'
+import app from "./app";
+import { CreateDocente } from "./endpoints/CreateDocente";
+import { CreateEstudante } from "./endpoints/CreateEstudante";
+import { CreateTurma } from "./endpoints/CreateTurma";
 
-const app = express()
-
-app.use(express.json())
-
-app.use(cors())
-
-
+const turmaCreate = new CreateTurma()
+const estudanteCreate = new CreateEstudante()
+const docenteCreate = new CreateDocente()
 
 
-app.listen(3003, () => {
-    console.log("Server is running in http://localhost:3003");
-});
+app.get("/turma", turmaCreate.getTurma)
+app.get("/estudante", estudanteCreate.getEstudanteName)
+app.get("/docente", docenteCreate.getDocente)
+
+
+app.post("/turma", turmaCreate.createTurma)
+app.post("/estudante/:id", estudanteCreate.postTurmaEstudante)
+app.post("/estudante", estudanteCreate.createEstudante)
+app.post("/docente", docenteCreate.createDocente)
+
+
+app.put("/turma/:id", turmaCreate.putTurmaModulo)
+app.put("/docente/:id", docenteCreate.putTurmaDocente)
+
+

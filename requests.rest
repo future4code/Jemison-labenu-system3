@@ -1,0 +1,72 @@
+POST  http://localhost:3003/turma
+Content-Type: application/json
+
+{
+    "name": "Jemison",
+    "modulo": "6"
+}
+
+###
+
+GET http://localhost:3003/turma
+
+
+###
+
+PUT http://localhost:3003/turma/43210
+Content-Type: application/json
+
+{
+    "modulo": "4"
+}
+
+###
+
+POST  http://localhost:3003/estudante
+Content-Type: application/json
+
+{
+    "name": "Jose",
+    "email": "jose@gmail.com",
+    "date_nasc": "10/01/1990",
+    "hobby_name": "Violão"
+}
+
+###
+
+GET http://localhost:3003/estudante?name=carlos
+
+###
+
+POST http://localhost:3003/estudante/78945
+Content-Type: application/json
+
+{
+    "turma_id": "43210"
+}
+
+###
+
+POST  http://localhost:3003/docente
+Content-Type: application/json
+
+{
+    "name": "Leticia",
+    "email": "leticia@gmail.com",
+    "date_nasc": "24/07/1993",
+    "turma_id": "1240",
+    "especialidade_id": "5"
+}
+
+###
+
+GET http://localhost:3003/docente
+
+###
+
+PUT http://localhost:3003/docente/46612
+Content-Type: application/json
+
+{
+    "turma_id": "5878"
+}

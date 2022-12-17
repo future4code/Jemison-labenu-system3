@@ -1,49 +1,90 @@
-import { Request, Response } from "express"
-import TurmaData from "../database/TurmaData"
-import DocenteData from "../database/DocenteData"
-import Docente from "../models/Docente"
+import { Request, Response } from "express";
+import { DocenteData } from "../data/DocenteData";
+import { EmailJaCadastrado } from "../error/EmailJaCadastrado";
+import { EspecialidadeNaoExiste } from "../error/docente/EspecialidadeNaoExiste";
+import { FaltandoInfoDocente } from "../error/docente/FaltandoInfoDocente";
+import { IdDocenteIdTurma } from "../error/docente/IdDocenteIdTurma";
+import { NaoDocentesCadastrados } from "../error/docente/NaoDocentesCadastrados";
+import { Docente } from "../model/Docente";
 
-
-export const createEstudante = async (req: Request, res: Response) => {
-    try {
-        const { nome, email, dataNascimento, turmaId } = req.body;
-        const id = Date.now().toString();
-
-        if (!nome || !email || !dataNascimento || !turmaId) {
-            req.statusCode = 400;
-            throw new Error("Todos os campos devem ser preenchidos!");
-          }
-          const newTeacher = new Docente(nome, email, turmaId, id);
-          const turmaData = new TurmaData();
-    
-          const TurmaExiste = await turmaData.selectTurmaId(turmaId);
-    
-          if (!TurmaExiste.length) {
-            throw new Error(`Turma com id ${turmaId} não existe`);
-          }
-          const teacherData = new DocenteData();
-    
-          await teacherData.insertTeacher(newTeacher);
-    
-          res.status(201).send(`Docente ${nome} criado com sucesso!`);
-        } catch (error: any) {
-          res.status(500).send({ message: error.message });
-        }
-      }
-      async getAllTeachers(req: Request, res: Response) {
+export class CreateDocente{
+    async createDocente(req: Request, res: Response) {
         try {
-          const teacherData = new DocenteData();
-    
-          const todosDocentes = await teacherData.selectTeachers();
-    
-          if (!todosDocentes?.length) {
-            throw new Error("não há docentes cadastrados");
-          }
-    
-          res.status(200).send(todosDocentes);
-        } catch (error: any) {
-          res.status(500).send({ message: error.message });
-        }
-      }
+            const { name, email, date_nasc, turma_id, especialidade_id } = req.body
+            if (!name || !email || !date_nasc) {
+                throw new FaltandoInfoDocente()
+            }
 
-      export default createEstudante
+            const id = Date.now().toString()
+            const newId = id.toString()
+
+            const idDocente = Date.now().toString()
+            const newIdDocente = idDocente.toString()
+
+            const new_date = date_nasc.split("/")
+            const deadlineInReverse = new_date.reverse()
+            const deadlineForAmerican = deadlineInReverse.join("/")
+
+
+            const docenteData = new DocenteData()
+            const docente = await docenteData.selectDocentes()
+            const verificaEmailExiste = docente.find((doce: any) => doce.email === email)
+
+            if (verificaEmailExiste) {
+                throw new EmailJaCadastrado()
+            }
+
+            const newDocente = new Docente(newIdDocente, name, email, deadlineForAmerican, turma_id, especialidade_id)
+
+            const result = await docenteData.selectEspecialidade()
+            const findEspecialidade = await result.find((resu: any) => resu.id === especialidade_id)
+
+            if (findEspecialidade) {
+                await docenteData.insertDocente(newDocente)
+                await docenteData.insertDocente_Especialidade(newId, newIdDocente, findEspecialidade.id)
+            } else {
+                throw new EspecialidadeNaoExiste()
+            }
+
+            res.status(200).send("Docente criado")
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message || "Erro do servidor" })
+        }
+    }
+
+    async getDocente(req: Request, res: Response) {
+        try {
+
+            const docenteData = new DocenteData()
+            const docente = await docenteData.selectDocentes()
+
+            if (!docente.length) {
+                throw new NaoDocentesCadastrados()
+            }
+
+            res.status(200).send(docente)
+
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+        }
+    }
+
+    async putTurmaDocente(req: Request, res: Response) {
+        try {
+            const id = req.params.id
+            const turma_id = req.body.turma_id
+
+            if (!id || !turma_id) {
+                throw new IdDocenteIdTurma()
+            }
+
+            const docenteData = new DocenteData()
+            await docenteData.editTurmaDocente(id, turma_id)
+            res.status(200).send("Turma Alterada")
+        } catch (error: any) {
+            res.status(error.statusCode || 500).send({ message: error.message })
+
+        }
+    }
+}
