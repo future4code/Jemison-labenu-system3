@@ -1,14 +1,21 @@
-import express from "express"
-import cors from 'cors'
-import dotenv from 'dotenv'
+import app  from "./app";
+import DocenteEndpoint from "./endpoints/Docente";
+import EstudanteEndpoint from "./endpoints/Estudante";
+import Estudante from "./endpoints/Estudante";
+import TurmaEndpoint from "./endpoints/Turma";
 
+const turma = new TurmaEndpoint()
+const estudante = new EstudanteEndpoint()
+const docente = new DocenteEndpoint()
 
-dotenv.config()
-const app = express()
+app.post("/criar-turma", turma.criar)
+app.get("/buscar-turmas-ativas", turma.ativa)
+app.post("/mudar-modulo/:id", turma.modulo)
 
-app.use(express.json())
-app.use(cors())
+app.post("/criar-estudante", estudante.criar)
+app.get("/estudante/:nome", estudante.buscar)
+app.post("/mudar-estudante/:id", estudante.mudarTurma)
 
-app.listen(3003, () => {
-    console.log("Server is running in http://localhost:3003");
-});
+app.post("/criar-docente", docente.criar)
+app.get("/buscar-docentes", docente.buscarTodos)
+app.post("/mudar-docente-turma/:id", docente.mudarTurma)
