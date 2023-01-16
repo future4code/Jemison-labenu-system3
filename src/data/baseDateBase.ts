@@ -6,11 +6,11 @@ dotenv.config()
 
 export abstract class BaseDataBase {
 
-    private connection: Knex | null = null;
+    private static connection: Knex | null = null;
 
-    protected getConnection() {
-        if (!this.connection) {
-            this.connection = knex({
+    protected getConnection():Knex {
+        if (!BaseDataBase.connection) {
+            BaseDataBase.connection = knex({
                 client: "mysql",
                 connection: {
                     host: process.env.DB_HOST,
@@ -24,11 +24,11 @@ export abstract class BaseDataBase {
            
         }
 
-        return this.connection
+        return BaseDataBase.connection
         
     }
    
 }
-export default BaseDataBase
+
 
 

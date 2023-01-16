@@ -1,48 +1,56 @@
 import { Docente } from "../model/Docente";
-import BaseDataBase from "./baseDateBase";
+import { BaseDataBase } from "./BaseDataBase";
 
-export class DocenteData extends BaseDataBase {
-    async insertDocente(docente: Docente): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: docente.getId(),
-                name: docente.getName(),
-                email: docente.getEmail(),
-                date_nasc: docente.getDate_nasc(),
-                turma_id: docente.getTurma_id(),
-            })
-            .into("LabenuSystem_Docente")
-    }
+export class DocenteData extends BaseDataBase{
+	async criarDocente(docente: Docente){
 
-    async insertDocente_Especialidade(id: string, docente_id: string, especialidade_id: string): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: id,
-                docente_id: docente_id,
-                especialidade_id: especialidade_id
-            })
-            .into("LabenuSystem_Docente_Especialidade")
-    }
+		await this.getConnection().insert({
+			id:docente.getId(),
+			nome:docente.getNome(),
+			email:docente.getEmail(),
+			data_nascimento:docente.getDataNascimento(),
+			turma_id:docente.getIdTurma(),
+		}).into("docente")
 
-    async selectDocentes(): Promise<Docente[]> {
-        const result = await this.getConnection()
-            .select("*")
-            .from("LabenuSystem_Docente")
-        return result
-    }
+		return `Docente com nome :'${docente.getNome()}' criado com sucesso`
+	}
+	async buscarDocentePorEmail(email: string){
+		const result = await this.getConnection()
+			.select("*")
+			.from("docente")
+			.where({ email })
 
-    async selectEspecialidade(): Promise<any[]> {
-        const result = await this.getConnection()
-            .select("id")
-            .from("LabenuSystem_Especialidade")
+			return result[0]
+	}
+	async buscarDocentes():Promise<Docente[]>{
+		const result = await this.getConnection()
+		.select("*")
+		.from("docente")
 
-        return result
-    }
+		const docenteTipado = result.map((docente)=>{
+			return new Docente(docente.nome, docente.email, docente.data_nascimento, docente.turma_id, docente.id)
+		})
 
-    async editTurmaDocente(id: string, turma_id: string): Promise<void> {
-        await this.getConnection().raw(`
-            update LabenuSystem_Docente set turma_id = ${turma_id}
-            where id = ${id}
-        `)
-    }
+		return docenteTipado
+	}
+	async buscarDocentePorId(id:string):Promise<Docente | undefined>{
+		const result = await this.getConnection()
+		.select("*")
+		.from("estudante")
+		.where({ id })
+
+		if(!result.length){
+			return undefined
+		}
+		return new Docente(result[0].nome, result[0].email, result[0].data_nascimento, result[0].turma_id, result[0].id)
+	}
+
+	async mudarDocenteTurma(id:string, turmaId:string):Promise<string>{
+		await this.getConnection()
+		.update({ turma_id: turmaId })
+		.into("docente")
+		.where({ id: id })
+
+		return `Docente com id ${id} atualizado para a turma ${turmaId}`
+	}
 }

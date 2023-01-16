@@ -1,29 +1,30 @@
-export class Usuario {
-    constructor(
-        private id: string,
-        private name: string,
-        private email: string,
-        private date_nasc: Date,
-        private turma_id?: string
-        )
-        {}
+export abstract class Usuario {
+    private id:string 
+    private nome:string
+    private email:string
+    private dataNascimento:string
+    private idTurma:string
 
-        getId() {
-            return this.id
-        }
-        getName() {
-            return this.name
-        }
-        getEmail() {
-            return this.email
-        }
-        getDate_nasc() {
-            return this.date_nasc
-        }
-        getTurma_id() {
-            return this.turma_id
-        }
-        setTurma_id(turma_id: string) {
-            this.turma_id = turma_id
-        }
+    constructor(nome:string, email:string, dataNascimento:string, idTurma:string, id:string){
+        this.nome = nome;
+        this.email = email;
+        this.dataNascimento = dataNascimento;
+        this.idTurma = idTurma;
+        this.id = id
+    }
+    getId(){
+        return this.id
+    }
+    getNome(){
+        return this.nome
+    }
+      getEmail(){
+        return this.email
+    }
+      getDataNascimento(){
+        return this.dataNascimento
+    }
+      getIdTurma(){
+        return this.idTurma
+    }
 }

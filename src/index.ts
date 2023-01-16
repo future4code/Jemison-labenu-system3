@@ -1,25 +1,21 @@
-import app from "./app";
-import { CreateDocente } from "./endpoints/CreateDocente";
-import { CreateEstudante } from "./endpoints/CreateEstudante";
-import { CreateTurma } from "./endpoints/CreateTurma";
+import app  from "./app";
+import DocenteEndpoint from "./endpoints/Docente";
+import EstudanteEndpoint from "./endpoints/Estudante";
+import Estudante from "./endpoints/Estudante";
+import TurmaEndpoint from "./endpoints/Turma";
 
-const turmaCreate = new CreateTurma()
-const estudanteCreate = new CreateEstudante()
-const docenteCreate = new CreateDocente()
+const turma = new TurmaEndpoint()
+const estudante = new EstudanteEndpoint()
+const docente = new DocenteEndpoint()
 
+app.post("/criar-turma", turma.criar)
+app.get("/buscar-turmas-ativas", turma.ativa)
+app.post("/mudar-modulo/:id", turma.modulo)
 
-app.get("/turma", turmaCreate.getTurma)
-app.get("/estudante", estudanteCreate.getEstudanteName)
-app.get("/docente", docenteCreate.getDocente)
+app.post("/criar-estudante", estudante.criar)
+app.get("/estudante/:nome", estudante.buscar)
+app.post("/mudar-estudante/:id", estudante.mudarTurma)
 
-
-app.post("/turma", turmaCreate.createTurma)
-app.post("/estudante/:id", estudanteCreate.postTurmaEstudante)
-app.post("/estudante", estudanteCreate.createEstudante)
-app.post("/docente", docenteCreate.createDocente)
-
-
-app.put("/turma/:id", turmaCreate.putTurmaModulo)
-app.put("/docente/:id", docenteCreate.putTurmaDocente)
-
-
+app.post("/criar-docente", docente.criar)
+app.get("/buscar-docentes", docente.buscarTodos)
+app.post("/mudar-docente-turma/:id", docente.mudarTurma)

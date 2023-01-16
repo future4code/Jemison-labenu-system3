@@ -1,72 +1,64 @@
-POST  http://localhost:3003/turma
+POST  http://localhost:3003/criar-turma
 Content-Type: application/json
 
 {
-    "name": "Jemison",
-    "modulo": "6"
+    "nome": "jemison"
 }
 
 ###
-
-GET http://localhost:3003/turma
-
-
-###
-
-PUT http://localhost:3003/turma/43210
+POST  http://localhost:3003/criar-estudante
 Content-Type: application/json
 
 {
-    "modulo": "4"
+    "nome":"Renato Pontes",
+    "email":"renato@gmail.com",
+    "dataNascimento":"20/09/1990",
+    "idTurma":"001"
 }
 
-###
 
-POST  http://localhost:3003/estudante
+###
+POST  http://localhost:3003/criar-docente
 Content-Type: application/json
 
 {
-    "name": "Jose",
-    "email": "jose@gmail.com",
-    "date_nasc": "10/01/1990",
-    "hobby_name": "Violão"
+    "nome": "Rafael Sander",
+    "email": "rafael@gmail.com",
+    "dataNascimento": "25/01/1989",
+    "idTurma": "001"
 }
 
 ###
-
-GET http://localhost:3003/estudante?name=carlos
-
-###
-
-POST http://localhost:3003/estudante/78945
+POST  http://localhost:3003/mudar-modulo/:id
 Content-Type: application/json
 
 {
-    "turma_id": "43210"
+    "modulo": 4
 }
 
 ###
-
-POST  http://localhost:3003/docente
+POST  http://localhost:3003/mudar-estudante/:id
 Content-Type: application/json
 
 {
-    "name": "Leticia",
-    "email": "leticia@gmail.com",
-    "date_nasc": "24/07/1993",
-    "turma_id": "1240",
-    "especialidade_id": "5"
+    "turma": "002"
 }
 
 ###
-
-GET http://localhost:3003/docente
-
-###
-
-PUT http://localhost:3003/docente/46612
+POST  http://localhost:3003/mudar-docente-turma/:id
 Content-Type: application/json
 
 {
-    "turma_id": "5878"
+    "turmaId": "002"
 }
+
+###
+GET http://localhost:3003/buscar-turmas-ativas
+
+
+###
+GET http://localhost:3003/estudante/:nome
+
+###
+GET http://localhost:3003/buscar-docentes
+

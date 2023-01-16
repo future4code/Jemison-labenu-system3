@@ -1,21 +1,20 @@
 export class Turma {
-    constructor(
-        private id: string, 
-        private name: string, 
-        private modulo: string)
-    {}
+    private id:string | undefined = Date.now().toString()
+    private nome:string | undefined
+    private modulo:string | undefined
 
-    getId() {
+    constructor(nome:string, id?:string, modulo?:string){
+        this.nome = nome
+        this.id = id
+        this.modulo = modulo
+    }
+
+    public getId(){
         return this.id
     }
-    getName(){
-        return this.name
-    }
-    getModulo(){
-        return this.modulo
-    }
-    setModulo(modulo: string) {
-        this.modulo = modulo
+
+    public getNome(){
+        return this.nome
     }
 }
 

@@ -1,32 +1,38 @@
 import { Turma } from "../model/Turma";
-import BaseDataBase from "./baseDateBase";
+import { BaseDataBase } from "./BaseDataBase";
 
-export class TurmaData extends BaseDataBase {
+export class TurmaData extends BaseDataBase{
 
-    async insertTurma(turma: Turma): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: turma.getId(),
-                name: turma.getName(),
-                modulo: turma.getModulo()
-            })
-            .into("LabenuSystem_Turma")
-    }
+	async criarTurma(turma:Turma):Promise<string>{
 
-    async selectTurma(): Promise<Turma[]> {
-        const result = await this.getConnection()
-            .select("*")
-            .from("LabenuSystem_Turma")
+		await this.getConnection().insert({
+			id:turma.getId(),
+			nome:turma.getNome()
+		}).into("turma")
+		return `turma ${turma.getNome()} criada com sucesso`
+	}
+	async selecionarTurmasAtivas(): Promise<Turma[]>{
+		const result = await this.getConnection().select("*").from("turma").where("modulo", ">", 0)
+		const todasTurmas = result.map((turma)=>{
+			return new Turma(turma.nome, turma.id, turma.modulo)
+		})
 
-        return result
-    }
+		return todasTurmas
+	}
 
-    async editModulo(id: string, modulo: string): Promise<void> {
-        await this.getConnection()
-            .update({
-                modulo: modulo
-            })
-            .into("LabenuSystem_Turma")
-            .where("id", id)
-    }
+	async mudarModulo(id:string, modulo:number):Promise<string>{
+		await this.getConnection().update({modulo})
+		.into("turma")
+		.where({id})
+
+		return `O modulo foi alterado com sucesso!`
+	}
+	async buscarTurmaPeloId(id:string){
+		const result = await this.getConnection()
+		.select("*")
+		.from("turma")
+		.where({id})
+
+		return result
+	}
 }

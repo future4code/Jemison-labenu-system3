@@ -1,83 +1,63 @@
 import { Estudante } from "../model/Estudante";
-import BaseDataBase from "./baseDateBase";
+import { BaseDataBase } from "./BaseDataBase";
 
-export class EstudanteData extends BaseDataBase {
+export class EstudanteData extends BaseDataBase{
 
-    async insertEstudante(estudante: Estudante): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: estudante.getId(),
-                name: estudante.getName(),
-                email: estudante.getEmail(),
-                date_nasc: estudante.getDate_nasc(),
+	async criarEstudante(estudante: Estudante){
+		await this.getConnection().insert({
+			id:estudante.getId(),
+			nome:estudante.getNome(),
+			email:estudante.getEmail(),
+			data_nascimento:estudante.getDataNascimento(),
+			turma_id:estudante.getIdTurma(),
+		}).into("estudante")
 
-            })
-            .into("LabenuSystem_Estudante")
+		return `Estudante com nome :'${estudante.getNome()}' criado com sucesso`
+	}
 
-    }
+	async buscaEstudantePorEmail(email: string){
 
-    async selectEstudanteName(name: string): Promise<Estudante[]> {
-        const result = await this.getConnection()
-            .select("*")
-            .where("name", "LIKE", `%${name}%`)
-            .from("LabenuSystem_Estudante")
-        return result
-    }
+		const result = await this.getConnection()
+		.select("*")
+		.from("estudante")
+		.where({ email })
 
-    async selectAllEstudante(): Promise<Estudante[]> {
-        const result = await this.getConnection()
-            .select("*")
-            .from("LabenuSystem_Estudante")
-        return result
-    }
+		return result[0]
+	}
 
-    async insertHobby(newIdHobby: string, hobby_name: string): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: newIdHobby,
-                name: hobby_name
-            })
-            .into("LabenuSystem_Hobby")
+	async buscarEstudantePorNome(nome:string):Promise<Estudante>{
+		const result = await this.getConnection()
+		.select("*")
+		.from("estudante")
+		.where({ nome })
 
-    }
+		if(!result.length){
+			return undefined
+		}
 
-    async insertEstudante_Hobby(id: string, estudante_id: string, hobby_id: string): Promise<void> {
-        await this.getConnection()
-            .insert({
-                id: id,
-                estudante_id: estudante_id,
-                hobby_id: hobby_id
-            })
-            .into("LabenuSystem_Estudante_Hobby")
-    }
+		return new Estudante(result[0].nome, result[0].email, result[0].data_nascimento, result[0].turma_id, result[0].id)
 
-    async selectHobby(): Promise<any> {
-        const result = await this.getConnection().raw(`
-            SELECT LabenuSystem_Hobby.id as hobby_id, LabenuSystem_Hobby.name as hobby_name, LabenuSystem_Estudante.id as estudante_id
-            FROM LabenuSystem_Estudante_Hobby 
-            JOIN LabenuSystem_Estudante 
-            ON LabenuSystem_Estudante_Hobby.estudante_id = LabenuSystem_Estudante.id
-            JOIN LabenuSystem_Hobby 
-            ON LabenuSystem_Estudante_Hobby.hobby_id = LabenuSystem_Hobby.id
-        `)
-        return result[0]
-    }
+	}
 
-    async editTurmaEstudante(estudante_id: string, turma_id: string): Promise<void> {
-        await this.getConnection()
-            .update({
-                turma_id: turma_id
-            })
-            .into("LabenuSystem_Estudante")
-            .where("id", estudante_id)
-    }
+	async buscarEstudantePorId(id: string):Promise<Estudante | undefined>{
+		const result = await this.getConnection()
+		.select("*")
+		.from("estudante")
+		.where({ id })
 
-    async addTurmaEstudante(id: string, turma_id: string): Promise<void> {
-        await this.getConnection().raw(`
-            update LabenuSystem_Estudante set turma_id = ${turma_id}
-            where id = ${id}
-        `)
-    }
+		if(!result.length){
+			return undefined
+		}
 
-    
+		return new Estudante(result[0].nome, result[0].email, result[0].data_nascimento, result[0].turma_id, result[0].id)
+
+	}
+	async mudarEstudanteTurma(id:string, turmaId:string):Promise<string>{
+		await this.getConnection()
+		.update({ turma_id: turmaId })
+		.into("estudante")
+		.where({ id: id })
+
+		return `estudante com id ${id} atualizado para a turma ${turmaId}`
+	}
 }
