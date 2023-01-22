@@ -1,15 +1,12 @@
 import { Request, Response } from "express";
 import { DocenteData } from "../data/DocenteData";
 import { TurmaData } from "../data/TurmaData";
-
 import { EmailJaCadastrado } from "../error/EmailJaCadastrado";
 import { FaltandoInfo } from "../error/FaltandoInfo";
 import { turmaInvalida } from "../error/turmaInvalida";
 import moment from "moment";
 import { Docente } from "../model/Docente";
 import { UsuarioNaoCadastrado } from "../error/EstudanteNaoCadastrado";
-
-
 
 class DocenteEndpoint{
 	async criar(req:Request, res:Response){
@@ -21,13 +18,14 @@ class DocenteEndpoint{
             }
             const turmaData = new TurmaData()
             const docenteData = new DocenteData()
-            const emailExiste = await docenteData.buscaEstudantePorEmail(email)
+
+            const emailExiste = await docenteData.buscarDocentePorEmail(email)
 
             if(emailExiste){
                 throw new EmailJaCadastrado()
         }
         
-        const idTurmaExiste = await turmadata.buscarTurmaPeloId(idTurma)
+        const idTurmaExiste = await turmaData.buscarTurmaPeloId(idTurma)
 
         if(!idTurmaExiste.length){
             throw new turmaInvalida()
@@ -49,7 +47,7 @@ class DocenteEndpoint{
         try{
             const docenteData = new DocenteData()
 
-            const todosDocentes = await docenteData.buscarDocente()
+            const todosDocentes = await docenteData.buscarDocentes()
 
             res.status(200).send(todosDocentes)
         }catch (error: any){

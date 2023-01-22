@@ -3,7 +3,6 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-
 export abstract class BaseDataBase {
 
     private static connection: Knex | null = null;

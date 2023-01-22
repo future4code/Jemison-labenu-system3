@@ -46,7 +46,7 @@ class TurmaEndpoint{
                  throw new FaltandoInfo()
              }
              if(modulo < 0 || modulo > 6){
-                throw new ModuloNaoPermitido()
+                throw new modulo()
              }
 
              const turmaData = new TurmaData()

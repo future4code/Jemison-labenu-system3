@@ -14,7 +14,7 @@ class EstudanteEndpoint{
         try{
             const { nome, email, dataNascimento, idTurma } = req.body
 
-            if(!nome || !email || !dataNascimento || idTurma){
+            if(!nome || !email || !dataNascimento || !idTurma){
                 throw new FaltandoInfo()
             }
             const estudanteData = new EstudanteData()
@@ -72,7 +72,7 @@ class EstudanteEndpoint{
            const estudanteExiste = await estudanteData.buscarEstudantePorId(id)
 
            if(!estudanteExiste){
-            throw new UsuarioNaoCadastrado()
+            throw new  UsuarioNaoCadastrado()
            }
 
            const turmadata = new TurmaData()
