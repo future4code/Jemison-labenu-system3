@@ -4,8 +4,7 @@
   "description": "Você estuda na Labenu_ há tanto tempo que já parecem anos, não é? Então, hoje, vamos pedir para criar um sistema que represente o básico da nossa organização.",
   "main": "index.js",
   "scripts": {
-    "start": "node ./build/index.js",
-    "build": "tsc",
+    "start": "tsc && node ./build/index.js",
     "dev": "ts-node-dev ./src/index.ts",
     "migrations": "tsc && node ./build/database/migrations.js"
   },
@@ -16,6 +15,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "knex": "^2.3.0",
+    "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "ts-node-dev": "^2.0.0"
   },

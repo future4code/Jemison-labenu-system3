@@ -25,7 +25,7 @@ export class EstudanteData extends BaseDataBase{
 		return result[0]
 	}
 
-	async buscarEstudantePorNome(nome:string):Promise<Estudante>{
+	async buscarEstudantePorNome(nome:string):Promise<Estudante | undefined>{
 		const result = await this.getConnection()
 		.select("*")
 		.from("estudante")

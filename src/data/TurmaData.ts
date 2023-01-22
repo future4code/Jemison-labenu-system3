@@ -12,8 +12,12 @@ export class TurmaData extends BaseDataBase{
 		return `turma ${turma.getNome()} criada com sucesso`
 	}
 	async selecionarTurmasAtivas(): Promise<Turma[]>{
-		const result = await this.getConnection().select("*").from("turma").where("modulo", ">", 0)
-		const todasTurmas = result.map((turma)=>{
+		const result = await this.getConnection()
+		.select("*")
+		.from("turma")
+		.where("modulo", ">", 0)
+
+		const todasTurmas = result.map((turma) =>{
 			return new Turma(turma.nome, turma.id, turma.modulo)
 		})
 
@@ -21,11 +25,12 @@ export class TurmaData extends BaseDataBase{
 	}
 
 	async mudarModulo(id:string, modulo:number):Promise<string>{
-		await this.getConnection().update({modulo})
+		await this.getConnection()
+		.update({modulo})
 		.into("turma")
 		.where({id})
 
-		return `O modulo foi alterado com sucesso!`
+		return `O módulo foi alterado com sucesso!`
 	}
 	async buscarTurmaPeloId(id:string){
 		const result = await this.getConnection()
