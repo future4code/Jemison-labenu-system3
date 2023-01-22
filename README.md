@@ -1,8 +1,8 @@
-[Link da documentação da API] (https://documenter.getpostman.com/view/22349146/2s8ZDU4Nzp)
+[Link da documentação da API](https://documenter.getpostman.com/view/22349146/2s8ZDU4Nzp)
 
 
 
-[Link do deploy] (https://labenu-system3.onrender.com)
+[Link do deploy](https://labenu-system3.onrender.com)
 
 ![Imagem-workbench](./print-workbench1.png)
 ![Imagem-workbench](./print-workbench2.png)
